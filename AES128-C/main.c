@@ -201,7 +201,7 @@ void AddRoundKey(unsigned int pTextSplit[], unsigned int resultMatrix[16], unsig
  * process to look up values in the sbox array which
  * are then stored in the subBytesArray array.
  *
- * Inputs: plainText - 16 integer array that contains
+ * Inputs: resultMatrix - 16 integer array that contains
  *         the result of the AddRoundKey step.
  *
  * * Outputs: subBytesArray - result of looking up sbox
@@ -209,9 +209,20 @@ void AddRoundKey(unsigned int pTextSplit[], unsigned int resultMatrix[16], unsig
  *          plainText array.
  *
  */
-void CalcSubBytes(int subBytesArray[], char plainText[])
+void CalcSubBytes(int subBytesArray[], unsigned int resultMatrix[])
 {
+  for (int i = 0; i < 16; i++)
+  {
+    subBytesArray[i] = getSBoxValue(resultMatrix[i]);
+  }
 
+  printf("\n==> Result of Sub Bytes step:\n");
+  for (int index = 0; index < 16; index++)
+  {
+    printf("%3x ", subBytesArray[index]);
+    if (index == 3 || index == 7 || index == 11 || index == 15)
+      printf("\n");
+  } /* for */
 } /* CalcSubBytes */
 
 /*
@@ -229,7 +240,61 @@ void CalcSubBytes(int subBytesArray[], char plainText[])
  */
 void ShiftRows(int subBytes[], int shiftRows[])
 {
+  int *row;
+  int index = 0;
 
+  for (int i = 0; i < 4; i++)
+  {
+    shiftRows[index++] = subBytes[i];
+    // printf("%x\n", shiftRows[i]);
+  }
+  //printf("%d\n", index);
+
+  for (int i = 1; i < 4; i++)
+  {
+    row = (int *)calloc(i, sizeof(int));
+    for (int j = 0; j < i; j++)
+    {
+      row[j] = subBytes[index + j];
+    }
+
+    switch (i)
+    {
+    case 1:
+      // printf("%d\n", index);
+      shiftRows[index] = subBytes[index + 1];
+      shiftRows[index + 1] = subBytes[index + 2];
+      shiftRows[index + 2] = subBytes[index + 3];
+      shiftRows[index + 3] = row[0];
+      index += 4;
+
+      break;
+
+    case 2:
+      shiftRows[index] = subBytes[index + 2];
+      shiftRows[index + 1] = subBytes[index + 3];
+      shiftRows[index + 2] = row[0];
+      shiftRows[index + 3] = row[1];
+      index += 4;
+      break;
+
+    case 3:
+      shiftRows[index] = subBytes[index + 3];
+      shiftRows[index + 1] = row[0];
+      shiftRows[index + 2] = row[1];
+      shiftRows[index + 3] = row[2];
+      break;
+    default:
+      break;
+    }
+  }
+  printf("\n==> Result of Shift Rows step:\n");
+  for (int index = 0; index < 16; index++)
+  {
+    printf("%3x ", shiftRows[index]);
+    if (index == 3 || index == 7 || index == 11 || index == 15)
+      printf("\n");
+  } /* for */
 } /* ShiftRows */
 
 /*
@@ -345,14 +410,18 @@ int main(void)
   {
 
     /* SubBytes */
+    CalcSubBytes(subBytes, temp);
 
     /* ShiftRows */
+    ShiftRows(subBytes, shiftRows);
 
     /* MixColumns */
+    MixColumns(shiftRows, mixCols);
 
     /* AddRoundKey */
     currentRotWord++;
-    AddRoundKey(plainTextSplit, temp, rotWords, currentRotWord);
+    printf("%d\n", currentRotWord);
+    AddRoundKey(mixCols, temp, rotWords, currentRotWord);
 
     encryptRound++;
     printf("\n*** Starting round %d of encryption\n", encryptRound);
