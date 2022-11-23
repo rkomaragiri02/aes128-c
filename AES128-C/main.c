@@ -222,6 +222,13 @@ void InputSplit(char enteredText[], unsigned int splitText[])
  */
 void AddRoundKey(unsigned int pTextSplit[], unsigned int resultMatrix[16], unsigned int rotData[11][16], int rotWordIndex)
 {
+  printf("\n==>Entering Add Round Key Step\n\n");
+
+  printf("Plain Text for XOR Operation:\n");
+  PrintMatrix(pTextSplit);
+  printf("\nLoaded rot word:\n");
+  PrintMatrix(rotData[rotWordIndex]);
+
   for (int i = 0; i < 4; i++)
   {
     for (int j = 0; j < 4; j++)
@@ -230,7 +237,7 @@ void AddRoundKey(unsigned int pTextSplit[], unsigned int resultMatrix[16], unsig
     }
   }
 
-  printf("\n==> Result of Adding Round Key:\n");
+  printf("\nResult of XOR Operation:\n");
   PrintMatrix(resultMatrix);
 
 } /* AddRoundKey */
