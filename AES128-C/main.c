@@ -29,6 +29,22 @@ unsigned int rotWords[11][16] = {
     {0xac, 0x77, 0x66, 0xf3, 0x19, 0xfa, 0xdc, 0x21, 0x28, 0xd1, 0x29, 0x41, 0x57, 0x5c, 0x00, 0x6e},
     {0xd0, 0x14, 0xf9, 0xa8, 0xc9, 0xee, 0x25, 0x89, 0xe1, 0x3f, 0x0c, 0xc8, 0xb6, 0x63, 0x0c, 0xa6}};
 
+/**
+ * Function Title: Print Matrix
+ *
+ * Description: Prints 16 length array as a 4x4 matrix
+ *
+ */
+void PrintMatrix(int *array)
+{
+  for (int index = 0; index < 16; index++)
+  {
+    printf("%3x ", array[index]);
+    if (index == 3 || index == 7 || index == 11 || index == 15)
+      printf("\n");
+  } /* for */
+}
+
 /*
  * Function Title: Transpose
  *
@@ -199,12 +215,11 @@ void InputSplit(char enteredText[], unsigned int splitText[])
  *
  *         rotWordIndex - rot word to use in operation
  *
- * Outputs: AESSplitKey - 16 integer array that
+ * Outputs: ResultMatrix - 16 integer array that
  *          contains the XOR of the split key and the
  *          current rotword.
  *
  */
-
 void AddRoundKey(unsigned int pTextSplit[], unsigned int resultMatrix[16], unsigned int rotData[11][16], int rotWordIndex)
 {
   for (int i = 0; i < 4; i++)
@@ -215,13 +230,8 @@ void AddRoundKey(unsigned int pTextSplit[], unsigned int resultMatrix[16], unsig
     }
   }
 
-  printf("\nResult Matrix:\n");
-  for (int index = 0; index < 16; index++)
-  {
-    printf("%3x ", resultMatrix[index]);
-    if (index == 3 || index == 7 || index == 11 || index == 15)
-      printf("\n");
-  } /* for */
+  printf("\n==> Result of Adding Round Key:\n");
+  PrintMatrix(resultMatrix);
 
 } /* AddRoundKey */
 
@@ -248,12 +258,7 @@ void CalcSubBytes(int subBytesArray[], unsigned int resultMatrix[])
   }
 
   printf("\n==> Result of Sub Bytes step:\n");
-  for (int index = 0; index < 16; index++)
-  {
-    printf("%3x ", subBytesArray[index]);
-    if (index == 3 || index == 7 || index == 11 || index == 15)
-      printf("\n");
-  } /* for */
+  PrintMatrix(subBytesArray);
 } /* CalcSubBytes */
 
 /*
@@ -320,12 +325,7 @@ void ShiftRows(int subBytes[], int shiftRows[])
     }
   }
   printf("\n==> Result of Shift Rows step:\n");
-  for (int index = 0; index < 16; index++)
-  {
-    printf("%3x ", shiftRows[index]);
-    if (index == 3 || index == 7 || index == 11 || index == 15)
-      printf("\n");
-  } /* for */
+  PrintMatrix(shiftRows);
 } /* ShiftRows */
 
 /*
@@ -374,12 +374,7 @@ void MixColumns(int shiftRows[], int mixCols[])
   mixCols[15] = (unsigned char)(table_3[shiftRows[3]] ^ shiftRows[7] ^ shiftRows[11] ^ table_2[shiftRows[15]]);
 
   printf("\n==> Result of Mix Columns step:\n");
-  for (int index = 0; index < 16; index++)
-  {
-    printf("%x ", mixCols[index]);
-    if (index == 3 || index == 7 || index == 11 || index == 15)
-      printf("\n");
-  } /* for */
+  PrintMatrix(mixCols);
 
 } /* MixColumns */
 
@@ -397,7 +392,7 @@ int main(void)
   unsigned int subBytes[16] = {0};  /* holds results of subytes step */
   unsigned int shiftRows[16] = {0}; /* holds results of shift rows step */
   unsigned int mixCols[16] = {0};   /* holds results of mix columns step */
-  unsigned int temp[16] = {0};      /* holds mixColss when they are being flipped from horiz to vert */
+  unsigned int temp[16] = {0};      /* holds mixCols after adding round key and after calculating sub bytes*/
   int currentRotWord = 0;           /* next rotword to use */
   int encryptRound = 1;             /* current encryption round */
 
@@ -451,7 +446,6 @@ int main(void)
 
     /* AddRoundKey */
     currentRotWord++;
-    printf("%d\n", currentRotWord);
     transpose(mixCols);
     AddRoundKey(mixCols, temp, rotWords, currentRotWord);
 
@@ -459,15 +453,31 @@ int main(void)
     printf("\n*** Starting round %d of encryption\n", encryptRound);
 
   } /* for */
-
-  /* SubBytes */
-
-  /* ShiftRows */
-
-  /* AddRoundKey */
   currentRotWord++;
 
+  /* SubBytes */
+  CalcSubBytes(subBytes, temp);
+
+  /* ShiftRows */
+  ShiftRows(subBytes, shiftRows);
+
+  /* AddRoundKey */
+  AddRoundKey(shiftRows, encryptedText, rotWords, currentRotWord);
+  printf("\n");
+  //PrintMatrix(rotWords[currentRotWord]);
+
   /* Display final encoded text */
+
+  printf("%s", "Encrypted text: ");
+  for (int i = 0; i < 4; i++)
+  {
+    for (int j = 0; j < 4; j++)
+    {
+      printf("%x ", encryptedText[i + (4 * j)]);
+    }
+    
+  }
+  
 
   return 0;
 }
