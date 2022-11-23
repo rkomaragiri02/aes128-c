@@ -30,6 +30,37 @@ unsigned int rotWords[11][16] = {
     {0xd0, 0x14, 0xf9, 0xa8, 0xc9, 0xee, 0x25, 0x89, 0xe1, 0x3f, 0x0c, 0xc8, 0xb6, 0x63, 0x0c, 0xa6}};
 
 /*
+ * Function Title: Transpose
+ *
+ *  Description: Takes array of length 16 and
+ *  transposes* (not 2d array but treats 16 length array as a 4x4 matrix)
+ *  elements
+ *
+ *  Inputs: 16 int array
+ */
+
+void transpose(int *array)
+{
+  int array2d[4][4];
+  int index = 0;
+  for (int i = 0; i < 4; i++)
+  {
+    for (int j = 0; j < 4; j++)
+    {
+      array2d[j][i] = array[index++];
+    }
+  }
+
+  for (int i = 0; i < 4; i++)
+  {
+    for (int j = 0; j < 4; j++)
+    {
+      array[j + (4 * i)] = array2d[i][j];
+    }
+  }
+}
+
+/*
  * Function Title: Input Split
  *
  * Description: Separate the user entered text string into
@@ -248,7 +279,7 @@ void ShiftRows(int subBytes[], int shiftRows[])
     shiftRows[index++] = subBytes[i];
     // printf("%x\n", shiftRows[i]);
   }
-  //printf("%d\n", index);
+  // printf("%d\n", index);
 
   for (int i = 1; i < 4; i++)
   {
@@ -421,6 +452,7 @@ int main(void)
     /* AddRoundKey */
     currentRotWord++;
     printf("%d\n", currentRotWord);
+    transpose(mixCols);
     AddRoundKey(mixCols, temp, rotWords, currentRotWord);
 
     encryptRound++;
