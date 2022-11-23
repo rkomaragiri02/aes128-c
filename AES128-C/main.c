@@ -413,7 +413,7 @@ int main(void)
 
   while (strlen(plainText) < 32 && plainText[0] != 'x')
   {
-    printf("Please enter your 32 character, 16 hexidecinal digit plaintext \n(x for default):\n");
+    printf("Please enter your 32 character, 16 hexidecimal digit plaintext \n(x for default):\n");
     scanf("%s", &plainText);
   }
 
