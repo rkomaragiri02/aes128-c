@@ -474,10 +474,8 @@ int main(void)
     for (int j = 0; j < 4; j++)
     {
       printf("%x ", encryptedText[i + (4 * j)]);
-    }
-    
+    }    
   }
-  
 
   return 0;
 }
