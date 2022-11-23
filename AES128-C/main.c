@@ -464,7 +464,7 @@ int main(void)
   /* AddRoundKey */
   AddRoundKey(shiftRows, encryptedText, rotWords, currentRotWord);
   printf("\n");
-  //PrintMatrix(rotWords[currentRotWord]);
+  // PrintMatrix(rotWords[currentRotWord]);
 
   /* Display final encoded text */
 
@@ -474,7 +474,7 @@ int main(void)
     for (int j = 0; j < 4; j++)
     {
       printf("%x ", encryptedText[i + (4 * j)]);
-    }    
+    }
   }
 
   return 0;
